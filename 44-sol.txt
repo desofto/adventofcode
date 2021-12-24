@@ -1,0 +1,52 @@
+z = 0
+
+x = (z % 26 + 13) === w     | false w = 1
+z = x ? z : z * 26 + w + 14 | z = 9+14 = 15
+
+x = (z % 26 + 12) === w     | false w = 1
+z = x ? z : z * 26 + w + 8  | z = 15*26 + 1
+
+x = (z % 26 + 11) === w     | false w = 1
+z = x ? z : z * 26 + w + 5  | z = 399*26 + 6
+
+x = (z % 26 + 0) === w      | true w = 6
+z = Math.floor(z/26)        | z = 399
+z = x ? z : z * 26 + w + 4  | z = 399
+
+x = (z % 26 + 15) === w     | false w = 4
+z = x ? z : z * 26 + w + 10 | z = 399*26+14
+
+x = (z % 26 - 13) === w     | true w = 1
+z = Math.floor(z/26)        | z = 399
+z = x ? z : z * 26 + w + 13 | z = 399
+
+x = (z % 26 + 10) === w     | false w = 1
+z = x ? z : z * 26 + w + 16 | z = 399*26+17
+
+x = (z % 26 - 9) === w      | true w = 8
+z = Math.floor(z/26)        | z = 399
+z = x ? z : z * 26 + w + 5  | z = 399
+
+x = (z % 26 + 11) === w     | false w = 1
+z = x ? z : z * 26 + w + 6  | z = 399*26+7
+
+x = (z % 26 + 13) === w     | false w = 2
+z = x ? z : z * 26 + w + 13 | z = 10381*26 + 15
+
+x = (z % 26 - 14) === w     | true w = 1
+z = Math.floor(z/26)        | z = 10381
+z = x ? z : z * 26 + w + 6  | z = 10381
+
+x = (z % 26 - 3) === w      | true w = 4
+z = Math.floor(z/26)        | z = 609
+z = x ? z : z * 26 + w + 7  | z = 609
+
+x = (z % 26 - 2) === w      | true w = 7
+z = Math.floor(z/26)        | z = 23
+z = x ? z : z * 26 + w + 13 | z = 23
+
+x = (z % 26 - 14) === w     | true w = 1
+z = Math.floor(z/26)        | z = 0
+z = x ? z : z * 26 + w + 3  | z = 0
+
+93499629698999
