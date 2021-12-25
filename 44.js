@@ -130,21 +130,79 @@ fs.readFile('./44.txt', 'utf8', (err, data) => {
     return z
   }
 
-  function turn(index, number) {
-    let n = number.split("")
-    for (let digit = 9; digit >= 1; digit--) {
-      if (index === 8) console.log(n.join(""))
-      n[index] = digit
-      if (execute2(n.join("")) === 0) {
-        console.log(">", n.join(""))
+  //let number = '11164118121471'.split('')
+
+  {
+    let minResult
+    let maxNumber
+    let number = '99999999999999'.split('')
+    let result = parseInt('11111111111111')
+    while (true) {
+      let found = false
+      for (let i1 = 0; i1 < number.length; i1++) {
+        for (let i2 = 0; i2 < number.length; i2++) {
+          minResult = null
+          maxNumber = [...number]
+          for (let d1 = 9; d1 >= 1; d1--) {
+            number[i1] = d1
+            for (let d2 = 9; d2 >= 1; d2--) {
+              number[i2] = d2
+              let r = execute(number.join(''))
+              if (r === 0) {
+                r = parseInt(number.join(''))
+                if (r > result) {
+                  found = true
+                  result = r
+                  console.log(result)
+                }
+              }
+              if (!minResult || r < minResult) {
+                minResult = r
+                maxNumber = [...number]
+              }
+            }
+          }
+          number = maxNumber
+        }
       }
-      if (index < 14) {
-        turn(index+1, n.join(""))
-      }
+      if (!found) break
     }
   }
 
-  //turn(0, '99999999999999')
-  let number = '11164118121471'
-  console.log(execute(number), execute2(number))
+  {
+    let minResult
+    let minNumber
+    let number = '11111111111111'.split('')
+    let result = parseInt('99999999999999')
+    while (true) {
+      let found = false
+      for (let i1 = 0; i1 < number.length; i1++) {
+        for (let i2 = 0; i2 < number.length; i2++) {
+          minResult = null
+          minNumber = [...number]
+          for (let d1 = 1; d1 <= 9; d1++) {
+            number[i1] = d1
+            for (let d2 = 1; d2 <= 9; d2++) {
+              number[i2] = d2
+              let r = execute(number.join(''))
+              if (r === 0) {
+                r = parseInt(number.join(''))
+                if (r < result) {
+                  found = true
+                  result = r
+                  console.log(result)
+                }
+              }
+              if (!minResult || r < minResult) {
+                minResult = r
+                minNumber = [...number]
+              }
+            }
+          }
+          number = minNumber
+        }
+      }
+      if (!found) break
+    }
+  }
 })
