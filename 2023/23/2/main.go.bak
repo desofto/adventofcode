@@ -1,0 +1,198 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"slices"
+	"strings"
+	"time"
+)
+
+type tRoute struct {
+  id int
+  x,y int
+  m [][]int
+}
+
+var routeID int
+var routes []*tRoute
+var input [][]byte
+
+func newRoute() *tRoute {
+  routeID++
+  r := &tRoute{ id: routeID }
+
+  for y := 0; y < len(input); y++ {
+    r.m = append(r.m, make([]int, len(input[y])))
+  }
+
+  return r
+}
+
+func main() {
+  data, err := os.ReadFile("./real.txt")
+  if err != nil { panic(err) }
+  lines := strings.Split(string(data), "\n")
+
+  for _, line := range lines {
+    if len(line) > 0 {
+      input = append(input, []byte(line))
+    }
+  }
+
+  routeID = 0
+  r := newRoute()
+  r.x = 0
+  r.y = 1
+  r.m[0][1] = 1
+
+  routes = append(routes, r)
+
+  duplicateRoute := func(route *tRoute) *tRoute{
+    new := newRoute()
+
+    for y := 0; y < len(route.m); y++ {
+      copy(new.m[y], route.m[y])
+    }
+
+    routes = append(routes, new)
+
+    return new
+  }
+
+  // fmt.Println(input)
+  // fmt.Println(route)
+
+  crosses := make(map[int]map[int]int)
+
+  updateCross := func(x,y int, steps int) {
+    row, ok := crosses[y]
+    if !ok {
+      row = make(map[int]int)
+      crosses[y] = row
+    }
+    row[x] = steps
+  }
+
+  maxPath := 0
+
+  tick := time.Now()
+
+  for {
+    done := true
+
+    for _, r := range routes[:min(1_000, len(routes))] {
+      x := r.x
+      y := r.y
+
+      active := false
+
+      rr := 0
+      if y > 0 && r.m[y-1][x] == 0 && input[y-1][x] != '#' {
+        rr++
+        if rr > 1 && r.m[y][x] >= crosses[y][x] * 3/4 {
+          updateCross(x,y, r.m[y][x])
+
+          new := duplicateRoute(r)
+          new.m[y-1][x] = new.m[y][x] + 1
+          new.m[y][x] = -1
+
+          r.m[y-1][x] = -1
+
+          new.x = x
+          new.y = y-1
+        } else {
+          r.m[y-1][x] = r.m[y][x] + 1
+          r.y--
+          active = true
+        }
+        done = false
+      }
+      if x > 0 && r.m[y][x-1] == 0 && input[y][x-1] != '#' {
+        rr++
+        if rr > 1 && r.m[y][x] >= crosses[y][x] * 3/4 {
+          updateCross(x,y, r.m[y][x])
+
+          new := duplicateRoute(r)
+          new.m[y][x-1] = new.m[y][x] + 1
+          new.m[y][x] = -1
+
+          r.m[y][x-1] = -1
+
+          new.x = x-1
+          new.y = y
+        } else {
+          r.m[y][x-1] = r.m[y][x] + 1
+          r.x--
+          active = true
+        }
+        done = false
+      }
+      if y < len(r.m)-1 && r.m[y+1][x] == 0 && input[y+1][x] != '#' {
+        rr++
+        if rr > 1 && r.m[y][x] >= crosses[y][x] * 3/4 {
+          updateCross(x,y, r.m[y][x])
+
+          new := duplicateRoute(r)
+          new.m[y+1][x] = new.m[y][x] + 1
+          new.m[y][x] = -1
+
+          r.m[y+1][x] = -1
+
+          new.x = x
+          new.y = y+1
+        } else {
+          r.m[y+1][x] = r.m[y][x] + 1
+          r.y++
+          active = true
+        }
+        done = false
+      }
+      if x < len(r.m[y])-1 && r.m[y][x+1] == 0 && input[y][x+1] != '#' {
+        rr++
+        if rr > 1 && r.m[y][x] >= crosses[y][x] * 3/4 {
+          updateCross(x,y, r.m[y][x])
+
+          new := duplicateRoute(r)
+          new.m[y][x+1] = new.m[y][x] + 1
+          new.m[y][x] = -1
+
+          r.m[y][x+1] = -1
+
+          new.x = x+1
+          new.y = y
+        } else {
+          r.m[y][x+1] = r.m[y][x] + 1
+          r.x++
+          active = true
+        }
+        done = false
+      }
+
+      steps := r.m[len(r.m)-1][len(r.m[len(r.m)-1])-2]
+      if steps > maxPath { maxPath = steps }
+
+      if !active {
+        i := slices.Index(routes, r)
+        if i >= 0 {
+          routes = append(routes[:i], routes[i+1:]...)
+        }
+      }
+    }
+
+    t := time.Now()
+    if t.Sub(tick).Seconds() > 5 {
+      tick = t
+      c := 0
+      for _, cr := range crosses {
+        c += len(cr)
+      }
+      fmt.Println(routeID, len(routes), c, maxPath)
+    }
+
+    if (done) { break }
+  }
+}
+
+// > 2826
+// > 5522
